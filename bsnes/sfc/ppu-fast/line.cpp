@@ -34,6 +34,86 @@ auto PPU::Line::flush() -> void {
       ppu.mode7LineGroups.endLerpLine[ppu.mode7LineGroups.count] = ppu.mode7LineGroups.endLine[ppu.mode7LineGroups.count] - offs;
       ppu.mode7LineGroups.count++;
     }
+    
+    //detect groups that do not have perspective
+    for(int i = 0; i < ppu.mode7LineGroups.count; i++) {
+      //the Mode 7 scale factors of the current line
+      int a = -1;
+      int b = -1;
+      int c = -1;
+      int d = -1;
+      //the Mode 7 scale factors of the previous line
+      int aPrev = -1;
+      int bPrev = -1;
+      int cPrev = -1;
+      int dPrev = -1;
+      //has a varying value been found for the factors
+      bool aVar = false;
+      bool bVar = false;
+      bool cVar = false;
+      bool dVar = false;
+      //has the variation been an increase or decrease
+      bool aInc = false;
+      bool bInc = false;
+      bool cInc = false;
+      bool dInc = false;
+      for(y = ppu.mode7LineGroups.startLerpLine[i]; y <= ppu.mode7LineGroups.endLerpLine[i]; y++) {
+        a = ((int)((int16)(ppu.lines[y].io.mode7.a)));
+        b = ((int)((int16)(ppu.lines[y].io.mode7.b)));
+        c = ((int)((int16)(ppu.lines[y].io.mode7.c)));
+        d = ((int)((int16)(ppu.lines[y].io.mode7.d)));
+        //has the value of 'a' changed compared to the last line
+        //(also is the factor larger than zero, which happens sometimes and seems to be a game specific issue, mostly at the edges ofthe screen or group)
+        if(aPrev > 0 && a > 0 && a != aPrev) {
+          if(!aVar) {
+            //if there have been no variation yet, store that there is one and store if it is an increase or decrease
+            aVar = true;
+            aInc = a > aPrev;
+          } else if(aInc != a > aPrev) {
+            //if there has been an increase and now we have a decrease, or vice versa, set the interpolationj lines to -1
+            //to deactivate perspective correction for this group and stop analyzing this group
+            ppu.mode7LineGroups.startLerpLine[i] = -1;
+            ppu.mode7LineGroups.endLerpLine[i] = -1;
+            break;
+          }
+        }
+        //b, c and d are handled like a
+        if(bPrev > 0 && b > 0 && b != bPrev) {
+          if(!bVar) {
+            bVar = true;
+            bInc = b > bPrev;
+          } else if(bInc != b > bPrev) {
+            ppu.mode7LineGroups.startLerpLine[i] = -1;
+            ppu.mode7LineGroups.endLerpLine[i] = -1;
+            break;
+          }
+        }
+        if(cPrev > 0 && c > 0 && c != cPrev) {
+          if(!cVar) {
+            cVar = true;
+            cInc = c > cPrev;
+          } else if(cInc != c > cPrev) {
+            ppu.mode7LineGroups.startLerpLine[i] = -1;
+            ppu.mode7LineGroups.endLerpLine[i] = -1;
+            break;
+          }
+        }
+        if(dPrev > 0 && d > 0 && d != dPrev) {
+          if(!dVar) {
+            dVar = true;
+            dInc = d > dPrev;
+          } else if(dInc != d > dPrev) {
+            ppu.mode7LineGroups.startLerpLine[i] = -1;
+            ppu.mode7LineGroups.endLerpLine[i] = -1;
+            break;
+          }
+        }
+        aPrev = a;
+        bPrev = b;
+        cPrev = c;
+        dPrev = d;
+      }
+    }
   }
 
   //render lines (in parallel)
