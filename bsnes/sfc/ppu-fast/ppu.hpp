@@ -340,6 +340,14 @@ public:
     uint width = 0;
     uint height = 0;
   } frame;
+
+  struct Mode7LineGroups {
+    int count = -1;
+    int startLine[32];
+    int endLine[32];
+    int startLerpLine[32];
+    int endLerpLine[32];
+  } mode7LineGroups;
 };
 
 extern PPU ppufast;

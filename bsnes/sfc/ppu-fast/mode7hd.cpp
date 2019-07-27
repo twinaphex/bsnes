@@ -7,15 +7,25 @@ auto PPU::Line::renderMode7HD(PPU::IO::Background& self, uint source) -> void {
   Pixel* below = &this->below[-1];
 
   //find the first and last scanline for interpolation
-  int y_a = y;
-  int y_b = y;
-  #define isLineMode7(n) (ppu.lines[n].io.bg1.tileMode == TileMode::Mode7 && ( \
+  int y_a = -1;
+  int y_b = -1;
+  #define isLineMode7(n) (ppu.lines[n].io.bg1.tileMode == TileMode::Mode7 && !ppu.lines[n].io.displayDisable && ( \
     (ppu.lines[n].io.bg1.aboveEnable || ppu.lines[n].io.bg1.belowEnable) \
   ))
   if(ppu.hdPerspective()) {
-    while(y_a >   1 && isLineMode7(y_a)) y_a--; y_a += 1;
-    while(y_b < 239 && isLineMode7(y_b)) y_b++; y_b -= 8;
-  } else {
+    //find the Mode 7 line group this line is in and use its interpolation lines
+    for(int i = 0; i < ppu.mode7LineGroups.count; i++) {
+      if(y >= ppu.mode7LineGroups.startLine[i] && y <= ppu.mode7LineGroups.endLine[i]) {
+        y_a = ppu.mode7LineGroups.startLerpLine[i];
+        y_b = ppu.mode7LineGroups.endLerpLine[i];
+        break;
+      }
+    }
+  }
+  if(y_a == -1 || y_b == -1) {
+    //if perspective correction is disabled or the group was detected as non-perspective use the neighboring lines
+    y_a = y;
+    y_b = y;
     if(y_a >   1 && isLineMode7(y_a)) y_a--;
     if(y_b < 239 && isLineMode7(y_b)) y_b++;
   }

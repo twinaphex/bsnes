@@ -2,6 +2,41 @@ uint PPU::Line::start = 0;
 uint PPU::Line::count = 0;
 
 auto PPU::Line::flush() -> void {
+  //determine Mode 7 line groups for perspective correction
+  ppu.mode7LineGroups.count = 0;
+  if(ppu.hdPerspective()) {
+    #define isLineMode7(l) (l.io.bg1.tileMode == TileMode::Mode7 \
+        && !l.io.displayDisable && (l.io.bg1.aboveEnable || l.io.bg1.belowEnable))
+    bool state = false;
+    uint y;
+    //find the Mode 7 groups
+    for(y = 0; y < Line::count; y++) {
+      if(state != isLineMode7(ppu.lines[Line::start + y])) {
+        state = !state;
+        if(state) {
+          ppu.mode7LineGroups.startLine[ppu.mode7LineGroups.count] = ppu.lines[Line::start + y].y;
+        } else {
+          ppu.mode7LineGroups.endLine[ppu.mode7LineGroups.count] = ppu.lines[Line::start + y].y - 1;
+          //the lines at the edges of Mode 7 groups may be erroneous, so start and end lines for interpolation are moved inside
+          int offs = (ppu.mode7LineGroups.endLine[ppu.mode7LineGroups.count] - ppu.mode7LineGroups.startLine[ppu.mode7LineGroups.count]) / 8;
+          ppu.mode7LineGroups.startLerpLine[ppu.mode7LineGroups.count] = ppu.mode7LineGroups.startLine[ppu.mode7LineGroups.count] + offs;
+          ppu.mode7LineGroups.endLerpLine[ppu.mode7LineGroups.count] = ppu.mode7LineGroups.endLine[ppu.mode7LineGroups.count] - offs;
+          ppu.mode7LineGroups.count++;
+        }
+      }
+    }
+    #undef isLineMode7
+    if(state) {
+      //close the last group if necessary
+      ppu.mode7LineGroups.endLine[ppu.mode7LineGroups.count] = ppu.lines[Line::start + y].y - 1;
+      int offs = (ppu.mode7LineGroups.endLine[ppu.mode7LineGroups.count] - ppu.mode7LineGroups.startLine[ppu.mode7LineGroups.count]) / 8;
+      ppu.mode7LineGroups.startLerpLine[ppu.mode7LineGroups.count] = ppu.mode7LineGroups.startLine[ppu.mode7LineGroups.count] + offs;
+      ppu.mode7LineGroups.endLerpLine[ppu.mode7LineGroups.count] = ppu.mode7LineGroups.endLine[ppu.mode7LineGroups.count] - offs;
+      ppu.mode7LineGroups.count++;
+    }
+  }
+
+  //render lines (in parallel)
   if(Line::count) {
     #pragma omp parallel for if(Line::count >= 8)
     for(uint y = 0; y < Line::count; y++) {
