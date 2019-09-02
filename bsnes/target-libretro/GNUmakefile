@@ -17,6 +17,7 @@ all: build;
 
 name := libretro.so
 flags += -std=c++17 -fpermissive -Wno-narrowing -Wno-multichar -fopenmp -g
+flags += -D__LIBRETRO__
 #flags += -DSFC_SUPERGAMEBOY 
 
 #include fc/GNUmakefile

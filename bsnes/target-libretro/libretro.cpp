@@ -380,7 +380,7 @@ RETRO_API void retro_get_system_av_info(struct retro_system_av_info *info)
 	info->geometry.max_width   = 9 * 256;  // 9x 256 for hd mode 7
 	info->geometry.max_height  = 9 * 240;  // 9x 240
 	info->timing.fps           = 60;
-	info->timing.sample_rate   = 48000;
+	info->timing.sample_rate   = 44100;
 }
 
 RETRO_API void retro_set_controller_port_device(unsigned port, unsigned device)
@@ -455,7 +455,7 @@ RETRO_API bool retro_load_game(const retro_game_info *game)
 	program->superFamicom.location = string(game->path);
 	program->base_name = string(game->path);
 
-	emulator->configure("Audio/Frequency", 48000);
+	emulator->configure("Audio/Frequency", 44100);
 
 	// turn into core options later
 	emulator->configure("Hacks/CPU/Overclock", 100);

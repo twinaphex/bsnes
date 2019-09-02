@@ -35,7 +35,11 @@ private:
   vector<shared_pointer<Stream>> _streams;
 
   uint _channels = 0;
+#ifdef __LIBRETRO__
+  double _frequency = 44100.0;
+#else
   double _frequency = 48000.0;
+#endif
 
   double _volume = 1.0;
   double _balance = 0.0;
