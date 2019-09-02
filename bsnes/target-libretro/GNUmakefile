@@ -1,3 +1,20 @@
+CC=gcc
+CXX=g++
+
+compile = \
+  $(strip \
+    $(if $(filter %.c,$<), \
+      $(CC) $(cflags) $(flags) $1 -c $< -o $@, \
+      $(if $(filter %.cpp,$<), \
+        $(CXX) $(cppflags) $(flags) $1 -c $< -o $@ \
+      ) \
+    ) \
+  )
+
+%.o: $<; $(call compile)
+
+all: build;
+
 name := libretro.so
 flags += -std=c++17 -fpermissive -Wno-narrowing -Wno-multichar -fopenmp -g
 #flags += -DSFC_SUPERGAMEBOY 
