@@ -33,7 +33,7 @@ auto PPU::renderCycle() const -> uint { return configuration.hacks.ppu.renderCyc
 #define ppu ppufast
 
 PPU::PPU() {
-  output = new uint16_t[2304 * 2160]();
+  output = new uint16_t[2816 * 2640]();
 
   for(uint l : range(16)) {
     lightTable[l] = new uint16_t[32768];

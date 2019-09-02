@@ -87,7 +87,7 @@ static void flush_variables()
 	{
       int val = variable.value[0] - '0';
 
-      if (val >= 1 && val <= 8)
+      if (val >= 1 && val <= 9)
 			emulator->configure("Hacks/PPU/Mode7/Scale", val);
 	}
 
@@ -300,7 +300,7 @@ static void set_environment_info(retro_environment_t cb)
 		{ "bsnes_ppu_deinterlace", "PPU Deinterlace; ON|OFF" },
 		{ "bsnes_ppu_no_sprite_limit", "PPU No sprite limit; OFF|ON" },
 		{ "bsnes_ppu_show_overscan", "Show Overscan; OFF|ON" },
-		{ "bsnes_mode7_scale", "HD Mode 7 Scale; 1x|2x|3x|4x|5x|6x|7x|8x" },
+		{ "bsnes_mode7_scale", "HD Mode 7 Scale; 1x|2x|3x|4x|5x|6x|7x|8x|9x" },
 		{ "bsnes_mode7_perspective", "HD Mode 7 Perspective correction; ON|OFF" },
 		{ "bsnes_mode7_supersample", "HD Mode 7 Supersampling; OFF|ON" },
 		{ "bsnes_mode7_mosaic", "HD Mode 7 HD->SD Mosaic; ON|OFF" },
@@ -377,8 +377,8 @@ RETRO_API void retro_get_system_av_info(struct retro_system_av_info *info)
 {
 	info->geometry.base_width  = 512;   // accurate ppu
 	info->geometry.base_height = program->overscan ? 480 : 448; // accurate ppu
-	info->geometry.max_width   = 2048;  // 8x 256 for hd mode 7
-	info->geometry.max_height  = 1920;  // 8x 240
+	info->geometry.max_width   = 9 * 256;  // 9x 256 for hd mode 7
+	info->geometry.max_height  = 9 * 240;  // 9x 240
 	info->timing.fps           = 60;
 	info->timing.sample_rate   = 48000;
 }
