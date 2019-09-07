@@ -7,7 +7,9 @@
 #include <nall/stdint.hpp>
 #include <nall/cipher/chacha20.hpp>
 
-#if defined(PLATFORM_LINUX) && __has_include(<sys/random.h>)
+#if defined(PLATFORM_ANDROID)
+  #include <sys/syscall.h>
+#elif defined(PLATFORM_LINUX) && __has_include(<sys/random.h>)
   #include <sys/random.h>
 #elif defined(PLATFORM_WINDOWS) && __has_include(<wincrypt.h>)
   #include <wincrypt.h>
@@ -37,7 +39,9 @@ template<typename Base> struct RNG {
 protected:
   auto randomSeed() -> uint256_t {
     uint256_t seed = 0;
-    #if defined(PLATFORM_BSD) || defined(PLATFORM_MACOS)
+    #if defined(PLATFORM_ANDROID)
+    syscall(__NR_getrandom, &seed, 32, 0x0001 /* GRND_NONBLOCK */);
+    #elif defined(PLATFORM_BSD) || defined(PLATFORM_MACOS)
     for(uint n : range(8)) seed = seed << 32 | (uint32_t)arc4random();
     #elif defined(PLATFORM_LINUX) && __has_include(<sys/random.h>)
     getrandom(&seed, 32, GRND_NONBLOCK);

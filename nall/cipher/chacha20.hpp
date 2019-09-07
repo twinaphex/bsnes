@@ -102,8 +102,13 @@ struct HChaCha20 : protected ChaCha20 {
 //192-bit nonce; 64-bit x 64-byte (256GB) counter
 struct XChaCha20 : ChaCha20 {
   XChaCha20(uint256_t key, uint192_t nonce, uint64_t counter = 0):
+#if defined(PLATFORM_ANDROID)
+  ChaCha20(HChaCha20(key, static_cast<uint128_t>(nonce)).key(), nonce >> 128, counter) {
+  }
+#else
   ChaCha20(HChaCha20(key, nonce).key(), nonce >> 128, counter) {
   }
+#endif
 };
 
 }
