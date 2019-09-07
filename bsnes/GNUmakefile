@@ -22,6 +22,14 @@ include $(nall.path)/GNUmakefile
 
 ifeq ($(platform),win)
   override platform = windows
+else ifeq ($(platform),mingw)
+  override platform = windows
+else ifeq ($(platform),osx)
+  override platform = macosx
+else ifeq ($(platform),unix)
+  override platform = linux
+else ifeq ($(platform),x)
+  override platform = linux
 endif
 
 ifeq ($(platform),windows)
