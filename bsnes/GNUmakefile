@@ -20,6 +20,12 @@ endif
 nall.path := ../nall
 include $(nall.path)/GNUmakefile
 
+ifeq ($(target), libretro)
+  ifeq ($(platform),win)
+	platform=windows
+  endif
+endif
+
 ifeq ($(platform),windows)
   ifeq ($(binary),application)
     options += -luuid -lkernel32 -luser32 -lgdi32 -lcomctl32 -lcomdlg32 -lshell32
