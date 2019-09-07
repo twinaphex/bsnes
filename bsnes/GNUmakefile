@@ -20,10 +20,8 @@ endif
 nall.path := ../nall
 include $(nall.path)/GNUmakefile
 
-ifeq ($(target), libretro)
-  ifeq ($(platform),win)
-	platform=windows
-  endif
+ifeq ($(platform),win)
+  override platform = windows
 endif
 
 ifeq ($(platform),windows)
