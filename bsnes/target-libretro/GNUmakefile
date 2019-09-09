@@ -1,7 +1,7 @@
 name := libretro.so
 flags += -Wno-narrowing -Wno-multichar -g -fPIC
 
-ifneq ($(platform),$(filter $(platform),macos ios-arm64))
+ifneq ($(platform),$(filter $(platform),macos ios-arm64 tvos-arm64))
 	flags += -fopenmp
 endif
 
@@ -22,4 +22,9 @@ else ifeq ($(platform), ios-arm64)
        IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
     endif
 	$(strip c++ -arch arm64 -marm -miphoneos-version-min=11.0 -isysroot $(IOSSDK) -o out/bsnes_hd_libretro_ios.dylib -shared $(objects) -lpthread -ldl)
+else ifeq ($(platform), tvos-arm64)
+    ifeq ($(IOSSDK),)
+       IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
+    endif
+	$(strip c++ -arch arm64 -marm -mtvos-version-min=11.0 -isysroot $(IOSSDK) -o out/bsnes_hd_libretro_tvos.dylib -shared $(objects) -lpthread -ldl)
 endif

@@ -1,7 +1,7 @@
 target := bsnes
 binary := application
 build := performance
-ifeq ($(platform),ios-arm64)
+ifeq ($(platform),$(filter $(platform),macos ios-arm64 tvos-arm64))
   openmp := false
 else
   openmp := true
@@ -18,7 +18,7 @@ endif
 
 # binaries built with this flag are faster, but are not portable to multiple machines.
 ifeq ($(local),true)
-ifneq ($(platform),ios-arm64)
+ifneq ($(platform),$(filter $(platform),ios-arm64 tvos-arm64))
   flags += -march=native
 endif
 endif
@@ -59,6 +59,13 @@ else ifeq ($(platform), ios-arm64)
        IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
     endif
     compiler := c++ -arch arm64 -marm -miphoneos-version-min=11.0 -isysroot $(IOSSDK) -Wno-error=implicit-function-declaration -DHAVE_POSIX_MEMALIGN
+else ifeq ($(platform), tvos-arm64)
+    flags += -fPIC
+    options += -dynamiclib
+    ifeq ($(IOSSDK),)
+       IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
+    endif
+    compiler := c++ -arch arm64 -marm -mtvos-version-min=11.0 -isysroot $(IOSSDK) -Wno-error=implicit-function-declaration -DHAVE_POSIX_MEMALIGN
 else ifneq ($(filter $(platform),linux bsd),)
   ifeq ($(binary),application)
     options += -Wl,-export-dynamic
