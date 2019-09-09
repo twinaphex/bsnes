@@ -53,19 +53,11 @@ else ifeq ($(platform),macos)
     options += -dynamiclib
   endif
 else ifeq ($(platform), ios-arm64)
-    flags += -fPIC
+    flags += -fPIC -miphoneos-version-min=11.0 -Wno-error=implicit-function-declaration -DHAVE_POSIX_MEMALIGN
     options += -dynamiclib
-    ifeq ($(IOSSDK),)
-       IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
-    endif
-    compiler := c++ -arch arm64 -marm -miphoneos-version-min=11.0 -isysroot $(IOSSDK) -Wno-error=implicit-function-declaration -DHAVE_POSIX_MEMALIGN
 else ifeq ($(platform), tvos-arm64)
-    flags += -fPIC
+    flags += -fPIC -mtvos-version-min=11.0 -Wno-error=implicit-function-declaration -DHAVE_POSIX_MEMALIGN
     options += -dynamiclib
-    ifeq ($(IOSSDK),)
-       IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
-    endif
-    compiler := c++ -arch arm64 -marm -mtvos-version-min=11.0 -isysroot $(IOSSDK) -Wno-error=implicit-function-declaration -DHAVE_POSIX_MEMALIGN
 else ifneq ($(filter $(platform),linux bsd),)
   ifeq ($(binary),application)
     options += -Wl,-export-dynamic
