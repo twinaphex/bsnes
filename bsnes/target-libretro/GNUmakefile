@@ -8,9 +8,9 @@ obj/libretro.o: target-libretro/libretro.cpp
 
 all: $(objects)
 ifeq ($(platform),linux)
-	$(strip $(compiler) -o out/bsnes_libretro.so -shared $(objects) -Wl,--no-undefined -Wl,--version-script=target-libretro/link.T -Wl,-Bdynamic -lpthread -ldl -lgomp)
+	$(strip $(compiler) -o out/bsnes_hd_libretro.so -shared $(objects) -Wl,--no-undefined -Wl,--version-script=target-libretro/link.T -Wl,-Bdynamic -lpthread -ldl -lgomp)
 else ifeq ($(platform),windows)
-	$(strip $(compiler) -o out/bsnes_libretro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=target-libretro/link.T -static-libgcc -static-libstdc++ -Wl,-Bstatic -lws2_32 -lpthread -lgomp -Wl,-Bdynamic)
+	$(strip $(compiler) -o out/bsnes_hd_libretro.dll -shared $(objects) -Wl,--no-undefined -Wl,--version-script=target-libretro/link.T -static-libgcc -static-libstdc++ -Wl,-Bstatic -lws2_32 -lpthread -lgomp -Wl,-Bdynamic)
 else ifeq ($(platform),macos)
-	$(strip $(compiler) -o out/bsnes_libretro.dylib -shared $(objects) -lpthread -ldl)
+	$(strip $(compiler) -o out/bsnes_hd_libretro.dylib -shared $(objects) -lpthread -ldl)
 endif

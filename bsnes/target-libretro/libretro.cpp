@@ -438,7 +438,7 @@ RETRO_API unsigned retro_api_version()
 
 RETRO_API void retro_get_system_info(retro_system_info *info)
 {
-	info->library_name     = "bsnes";
+	info->library_name     = "bsnes HD";
 	info->library_version  = Emulator::Version;
 	info->need_fullpath    = false;
 	info->valid_extensions = "smc|sfc";
