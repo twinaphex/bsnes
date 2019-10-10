@@ -263,7 +263,10 @@ auto pollInputDevices(uint port, uint device, uint input) -> int16
 		default:
 			return 0;
 	}
-
+	
+	// This is costly but bsnes has no concept of input_state like in libretro
+	input_poll(); 
+	
 	return input_state(libretro_port, libretro_device, libretro_index, libretro_id);
 }
 
