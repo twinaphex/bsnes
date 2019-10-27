@@ -37,7 +37,7 @@ static string sgb_bios;
 
 #define RETRO_GAME_TYPE_SGB             0x101 | 0x1000
 #define RETRO_MEMORY_SGB_SRAM ((1 << 8) | RETRO_MEMORY_SAVE_RAM)
-#define RETRO_MEMORY_GB_SRAM ((1 << 8) | RETRO_MEMORY_SAVE_RAM)
+#define RETRO_MEMORY_GB_SRAM ((2 << 8) | RETRO_MEMORY_SAVE_RAM)
 
 static void flush_variables()
 {
@@ -278,7 +278,7 @@ static void set_environment_info(retro_environment_t cb)
     };
 
     static const struct retro_subsystem_memory_info gb_memory[] = {
-        { "srm", RETRO_MEMORY_SGB_SRAM },
+        { "srm", RETRO_MEMORY_GB_SRAM },
     };
 
     static const struct retro_subsystem_rom_info sgb_roms[] = {
