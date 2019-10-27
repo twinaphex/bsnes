@@ -282,8 +282,8 @@ static void set_environment_info(retro_environment_t cb)
     };
 
     static const struct retro_subsystem_rom_info sgb_roms[] = {
-        { "Super Game Boy ROM", "smc|sfc|swc|fig|bs", true, false, true, sgb_memory, 1 },
         { "Game Boy ROM", "gb|gbc", true, false, true, gb_memory, 1 },
+        { "Super Game Boy ROM", "smc|sfc|swc|fig|bs", true, false, true, sgb_memory, 1 },
     };
 
     static const struct retro_subsystem_info subsystems[] = {
@@ -589,12 +589,10 @@ RETRO_API bool retro_load_game_special(unsigned game_type,
 	{
 		case RETRO_GAME_TYPE_SGB:
 		{
-			string sgb_full_path = string(info[0].path).transform("\\", "/");
-
-			libretro_print(RETRO_LOG_INFO, "SGB ROM: %s\n", info[0].path);
-			libretro_print(RETRO_LOG_INFO, "GB ROM: %s\n", info[1].path);
-			program->superFamicom.location = info[0].path;
-			program->gameBoy.location = info[1].path;
+			libretro_print(RETRO_LOG_INFO, "GB ROM: %s\n", info[0].path);
+			libretro_print(RETRO_LOG_INFO, "SGB ROM: %s\n", info[1].path);
+			program->gameBoy.location = info[0].path;
+			program->superFamicom.location = info[1].path;
 		}
 		break;
 		default:
