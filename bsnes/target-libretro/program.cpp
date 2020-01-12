@@ -190,7 +190,6 @@ auto Program::load() -> void {
 	if(title == "Sugoro Quest++") emulator->configure("Hacks/PPU/RenderCycle", 128);
 
 	if (emulator->configuration("Hacks/Hotfixes")) {
-		if (title == "The Hurricanes") emulator->configure("Hacks/Entropy", "None");
 		//this game transfers uninitialized memory into video RAM: this can cause a row of invalid tiles
 		//to appear in the background of stage 12. this one is a bug in the original game, so only enable
 		//it if the hotfixes option has been enabled.

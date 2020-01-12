@@ -577,7 +577,8 @@ RETRO_API void retro_cheat_set(unsigned index, bool enabled, const char *code)
 	{
 		decoded = decodeGB(cheat);
 	}
-	else {
+	else
+	{
 		decoded = decodeSNES(cheat);
 	}
 
