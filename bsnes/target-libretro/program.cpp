@@ -346,6 +346,17 @@ auto Program::openRomSuperFamicom(string name, vfs::file::mode mode) -> shared_p
 		return vfs::memory::file::open(superFamicom.expansion.data(), superFamicom.expansion.size());
 	}
 
+	if(name == "msu1/data.rom")
+	{
+		return vfs::fs::file::open({Location::notsuffix(superFamicom.location), ".msu"}, mode);
+	}
+
+	if(name.match("msu1/track*.pcm"))
+	{
+		name.trimLeft("msu1/track", 1L);
+		return vfs::fs::file::open({Location::notsuffix(superFamicom.location), name}, mode);
+	}
+
 	if(name == "save.ram")
 	{
 		string save_path;
