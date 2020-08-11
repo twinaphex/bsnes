@@ -267,13 +267,17 @@ inline auto directory::copy(const string& source, const string& target) -> bool 
   }
 #else
   inline auto directoryIsFolder(DIR* dp, struct dirent* ep) -> bool {
+#ifndef PLATFORM_HAIKU
     if(ep->d_type == DT_DIR) return true;
     if(ep->d_type == DT_LNK || ep->d_type == DT_UNKNOWN) {
+#endif
       //symbolic links must be resolved to determine type
       struct stat sp = {0};
       fstatat(dirfd(dp), ep->d_name, &sp, 0);
       return S_ISDIR(sp.st_mode);
+#ifndef PLATFORM_HAIKU
     }
+#endif
     return false;
   }
 

@@ -4,7 +4,7 @@ namespace nall {
   using uint = unsigned;
 
   enum class Compiler : uint { Clang, GCC, Microsoft, Unknown };
-  enum class Platform : uint { Windows, MacOS, Linux, BSD, Android, Unknown };
+  enum class Platform : uint { Windows, MacOS, Linux, BSD, BeAPI, Android, Unknown };
   enum class API : uint { Windows, Posix, Unknown };
   enum class DisplayServer : uint { Windows, Quartz, Xorg, Unknown };
   enum class Architecture : uint { x86, amd64, ARM32, ARM64, PPC32, PPC64, Unknown };
@@ -105,6 +105,13 @@ namespace nall {
   constexpr auto platform() -> Platform { return Platform::BSD; }
   constexpr auto api() -> API { return API::Posix; }
   constexpr auto display() -> DisplayServer { return DisplayServer::Xorg; }
+#elif defined(__HAIKU__)
+  #define PLATFORM_HAIKU
+  #define API_POSIX
+  #define DISPLAY_UNKNOWN
+  constexpr auto platform() -> Platform { return Platform::BeAPI; }
+  constexpr auto api() -> API { return API::Posix; }
+  constexpr auto display() -> DisplayServer { return DisplayServer::Unknown; }
 #else
   #warning "unable to detect platform"
   #define PLATFORM_UNKNOWN
@@ -123,6 +130,8 @@ namespace nall {
   #include <endian.h>
 #elif defined(PLATFORM_BSD)
   #include <sys/endian.h>
+#elif defined(PLATFORM_HAIKU)
+  #include <posix/endian.h>
 #endif
 
 /* Architecture detection */

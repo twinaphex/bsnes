@@ -31,6 +31,8 @@ ifeq ($(platform),)
     platform := linux
   else ifneq ($(findstring BSD,$(uname)),)
     platform := bsd
+  else ifneq ($(findstring Haiku,$(uname)),)
+    platform := haiku
   else
     $(error unknown platform, please specify manually.)
   endif
@@ -136,6 +138,12 @@ ifeq ($(platform),bsd)
   options += -Wl,-rpath=/usr/local/lib
   options += -Wl,-rpath=/usr/local/lib/gcc8
   options += -lstdc++ -lm
+endif
+
+# haiku settings
+ifeq ($(platform),haiku)
+  flags   += -march=native
+  options += -Wl,-export-dynamic
 endif
 
 # threading support
