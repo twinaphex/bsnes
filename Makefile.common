@@ -1,0 +1,56 @@
+SOURCES_CXX :=
+SOURCES_C   :=
+
+BSNES_DIR   := $(CORE_DIR)/bsnes
+GB_DIR      := $(BSNES_DIR)/gb
+SNES_DIR    := $(BSNES_DIR)/sfc
+
+INCFLAGS := \
+			   -I$(CORE_DIR) \
+				-I$(BSNES_DIR) \
+				-I$(GB_DIR) \
+				-I$(SNES_DIR)
+
+SOURCES_C   += $(CORE_DIR)/libco/libco.c \
+					$(GB_DIR)/Core/apu.c \
+					$(GB_DIR)/Core/camera.c \
+					$(GB_DIR)/Core/display.c \
+					$(GB_DIR)/Core/gb.c \
+					$(GB_DIR)/Core/joypad.c \
+					$(GB_DIR)/Core/mbc.c \
+					$(GB_DIR)/Core/memory.c \
+					$(GB_DIR)/Core/printer.c \
+					$(GB_DIR)/Core/random.c \
+					$(GB_DIR)/Core/rewind.c \
+					$(GB_DIR)/Core/save_state.c \
+					$(GB_DIR)/Core/sgb.c \
+					$(GB_DIR)/Core/sm83_cpu.c \
+					$(GB_DIR)/Core/symbol_hash.c \
+					$(GB_DIR)/Core/timing.c \
+
+SOURCES_CXX += \
+					$(BSNES_DIR)/target-libretro/libretro.cpp \
+					$(BSNES_DIR)/emulator/emulator.cpp \
+					$(BSNES_DIR)/filter/filter.cpp \
+					$(BSNES_DIR)/lzma/lzma.cpp \
+					$(SNES_DIR)/interface/interface.cpp \
+					$(SNES_DIR)/system/system.cpp \
+					$(SNES_DIR)/controller/controller.cpp \
+					$(SNES_DIR)/cartridge/cartridge.cpp \
+					$(SNES_DIR)/memory/memory.cpp \
+					$(SNES_DIR)/cpu/cpu.cpp \
+					$(SNES_DIR)/smp/smp.cpp \
+					$(SNES_DIR)/dsp/dsp.cpp \
+					$(SNES_DIR)/ppu/ppu.cpp \
+					$(SNES_DIR)/ppu-fast/ppu.cpp \
+					$(SNES_DIR)/expansion/expansion.cpp \
+					$(SNES_DIR)/coprocessor/coprocessor.cpp \
+					$(SNES_DIR)/slot/slot.cpp \
+					$(BSNES_DIR)/processor/arm7tdmi/arm7tdmi.cpp \
+					$(BSNES_DIR)/processor/spc700/spc700.cpp \
+					$(BSNES_DIR)/processor/wdc65816/wdc65816.cpp 
+
+ifneq ($(STATIC_LINKING), 1)
+   SOURCES_CXX +=
+   SOURCES_C += 
+endif
