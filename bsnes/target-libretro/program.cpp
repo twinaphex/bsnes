@@ -29,10 +29,6 @@ static const int POINTER_PRESSED_CYCLES = 4;
 static int pointer_cycles_after_released = 0;
 static int pointer_pressed_last_x = 0;
 static int pointer_pressed_last_y = 0;
-static int superscope_last_pressed_trigger = 0;
-static int superscope_last_pressed_cursor = 0;
-static int superscope_last_pressed_turbo = 0;
-static int superscope_last_pressed_paused = 0;
 
 struct retro_pointer_state
 {
@@ -145,6 +141,30 @@ static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
     }
 }
 
+static int input_handle_touchscreen_lightgun( unsigned port, unsigned gun_device, unsigned inputId)
+{
+	input_update_pointer_lightgun(port, gun_device);
+	printf("yoshi debug: x: %i, y: %i, trig: %i, curs: %i, turbo: %i, start: %i\n", retro_pointer.x, retro_pointer.y, retro_pointer.superscope_trigger_pressed, retro_pointer.superscope_cursor_pressed, retro_pointer.superscope_turbo_pressed, retro_pointer.superscope_start_pressed);
+	switch (inputId)
+	{
+		case 0: // X
+			return retro_pointer.x;
+		case 1: // Y
+			return retro_pointer.y;
+		case 2: // Trigger
+			// todo: reverse button setting
+			return retro_pointer.superscope_trigger_pressed ? 1 : 0;
+		case 3: // Cursor
+			return retro_pointer.superscope_cursor_pressed ? 1 : 0;
+		case 4: // Turbo
+			return retro_pointer.superscope_turbo_pressed ? 1 : 0;
+		case 5: // Pause
+			return retro_pointer.superscope_start_pressed ? 1 : 0;
+		default:
+			printf("Unknown input for super scope: %i \n",inputId);
+			return 0;
+	} 
+}
 
 struct Program : Emulator::Platform
 {
@@ -439,28 +459,9 @@ auto pollInputDevices(uint port, uint device, uint input) -> int16
 		// TODO: SuperScope/Justifiers.
 		// Do we care? The v94 port hasn't hooked them up. :)
 		case SuperFamicom::ID::Device::SuperScope:
-		{
 			libretro_device = RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE;
-			input_update_pointer_lightgun(libretro_port, libretro_device);
-			printf("yoshi debug: x: %i, y: %i, trig: %i, curs: %i, turbo: %i, start: %i", retro_pointer.x, retro_pointer.y, retro_pointer.superscope_trigger_pressed, retro_pointer.superscope_cursor_pressed, retro_pointer.superscope_turbo_pressed, retro_pointer.superscope_start_pressed);
-			switch (input)
-			{
-				case 0: // X
-					return retro_pointer.x;
-				case 1: // Y
-					return retro_pointer.y;
-				case 2: // Trigger
-					// todo: reverse button setting
-					return retro_pointer.superscope_trigger_pressed ? 1 : 0;
-				case 3: // Turbo
-					return retro_pointer.superscope_turbo_pressed ? 1 : 0;
-				case 4: // Pause
-					return retro_pointer.superscope_start_pressed ? 1 : 0;
-				default:
-					printf("Unknown input for super scope!\n");
-			} 
+			return input_handle_touchscreen_lightgun(libretro_port, libretro_device, input);
 			break;
-		}
 
 		default:
 			return 0;
