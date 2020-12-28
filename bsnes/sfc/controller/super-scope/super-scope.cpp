@@ -92,8 +92,9 @@ auto SuperScope::latch(bool data) -> void {
 auto SuperScope::latch() -> void {
   int nx = platform->inputPoll(port, ID::Device::SuperScope, X);
   int ny = platform->inputPoll(port, ID::Device::SuperScope, Y);
-  x = max(-16, min(256 + 16, nx + x));
-  y = max(-16, min((int)ppu.vdisp() + 16, ny + y));
+  bool relativeMode = configuration.input.pointer.relative;
+  x = max(-16, min(256 + 16, relativeMode ? x + nx : nx ));
+  y = max(-16, min((int)ppu.vdisp() + 16, relativeMode ? y + ny : ny));
   offscreen = (x < 0 || y < 0 || x >= 256 || y >= (int)ppu.vdisp());
   if(!offscreen) ppu.latchCounters(x, y);
 }

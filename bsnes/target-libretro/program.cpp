@@ -18,7 +18,149 @@ using namespace nall;
 
 #include "resources.hpp"
 
+#include "libretro.h"
+#define RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE  RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_LIGHTGUN, 0)
+
 static Emulator::Interface *emulator;
+
+// Touchscreen Lightgun Support
+static const int POINTER_PRESSED_CYCLES = 4;  // For touchscreen sensitivity
+struct retro_pointer_state
+{
+	int x;
+	int y;
+	bool superscope_trigger_pressed;
+	bool superscope_cursor_pressed;
+	bool superscope_turbo_pressed;
+	bool superscope_start_pressed;
+
+	int pointer_pressed = 0;
+	int pointer_cycles_after_released = 0;
+	int pointer_pressed_last_x = 0;
+	int pointer_pressed_last_y = 0;
+};
+static retro_pointer_state retro_pointer = { 0, 0, false, false, false, false };
+static bool retro_pointer_enabled = false;
+static bool retro_pointer_superscope_reverse_buttons = false;
+static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
+{
+	int x, y;
+	x = input_state(port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
+	y = input_state(port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
+
+	int screen_width = 256;
+	int screen_height = 224;
+
+	/*scale & clamp*/
+	x = ( ( x + 0x7FFF ) * screen_width ) / 0xFFFF;
+	if ( x < 0 )
+		x = 0;
+	else if ( x >= screen_width )
+		x = screen_width - 1;
+
+	/*scale & clamp*/
+	y = ( ( y + 0x7FFF ) * screen_height ) / 0xFFFF;
+	if ( y < 0 )
+		y = 0;
+	else if ( y >= screen_height )
+		y = screen_height - 1;
+
+	// Touch sensitivity: Keep the gun position held for a fixed number of cycles after touch is released
+	// because a very light touch can result in a misfire
+	if ( retro_pointer.pointer_cycles_after_released > 0 && retro_pointer.pointer_cycles_after_released < POINTER_PRESSED_CYCLES ) {
+			retro_pointer.pointer_cycles_after_released++;
+			retro_pointer.x = retro_pointer.pointer_pressed_last_x;
+			retro_pointer.y = retro_pointer.pointer_pressed_last_y;
+			return;
+	}
+
+	if ( input_state( port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED ) )
+	{
+			retro_pointer.pointer_pressed = 1;
+			retro_pointer.pointer_cycles_after_released = 0;
+			retro_pointer.pointer_pressed_last_x = x;
+			retro_pointer.pointer_pressed_last_y = y;
+	} else if ( retro_pointer.pointer_pressed ) {
+			retro_pointer.pointer_cycles_after_released++;
+			retro_pointer.pointer_pressed = 0;
+			x = retro_pointer.pointer_pressed_last_x;
+			y = retro_pointer.pointer_pressed_last_y;
+			// unpress the primary trigger
+			if (retro_pointer_superscope_reverse_buttons)
+				retro_pointer.superscope_cursor_pressed = false;
+			else
+				retro_pointer.superscope_trigger_pressed = false;
+			return;
+    }
+		retro_pointer.x = x;
+		retro_pointer.y = y;
+
+    // triggers
+    switch (gun_device)
+    {
+        case RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE:
+        {
+					bool start_pressed = false;
+					bool trigger_pressed = false;
+					bool turbo_pressed = false;
+					bool cursor_pressed = false;
+					if ( input_state(port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED) ) {
+							int touch_count = input_state(port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_COUNT);
+							if ( touch_count == 4 ) {
+									// start button
+									start_pressed = true;
+							} else if ( touch_count == 3 ) {
+									turbo_pressed = true;
+							} else if ( touch_count == 2 ) {
+								if ( retro_pointer_superscope_reverse_buttons )
+								{
+									trigger_pressed = true;
+								} else
+								{
+									cursor_pressed = true;
+								}
+							} else {
+								if ( retro_pointer_superscope_reverse_buttons )
+								{
+									cursor_pressed = true;
+								} else
+								{
+									trigger_pressed = true;
+								}
+							}
+					}
+					retro_pointer.superscope_trigger_pressed = trigger_pressed;
+					retro_pointer.superscope_cursor_pressed = cursor_pressed;
+					retro_pointer.superscope_start_pressed = start_pressed;
+					retro_pointer.superscope_turbo_pressed = turbo_pressed;
+					break;
+				}
+				default:
+					break;
+    }
+}
+
+static int input_handle_touchscreen_lightgun( unsigned port, unsigned gun_device, unsigned inputId)
+{
+	input_update_pointer_lightgun(port, gun_device);
+	switch (inputId)
+	{
+		case 0: // X
+			return retro_pointer.x;
+		case 1: // Y
+			return retro_pointer.y;
+		case 2: // Trigger
+			return retro_pointer.superscope_trigger_pressed ? 1 : 0;
+		case 3: // Cursor
+			return retro_pointer.superscope_cursor_pressed ? 1 : 0;
+		case 4: // Turbo
+			return retro_pointer.superscope_turbo_pressed ? 1 : 0;
+		case 5: // Pause
+			return retro_pointer.superscope_start_pressed ? 1 : 0;
+		default:
+			return 0; // Unknown input
+	} 
+}
 
 struct Program : Emulator::Platform
 {
@@ -312,6 +454,16 @@ auto pollInputDevices(uint port, uint device, uint input) -> int16
 
 		// TODO: SuperScope/Justifiers.
 		// Do we care? The v94 port hasn't hooked them up. :)
+		case SuperFamicom::ID::Device::SuperScope:
+		{
+			libretro_device = RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE;
+			if (retro_pointer_enabled)
+			{
+				return input_handle_touchscreen_lightgun(libretro_port, libretro_device, input);
+			} else {
+				return 0;
+			}
+		}
 
 		default:
 			return 0;

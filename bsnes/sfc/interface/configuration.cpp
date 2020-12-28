@@ -39,6 +39,8 @@ auto Configuration::process(Markup::Node document, bool load) -> void {
   bind(natural, "Hacks/SA1/Overclock", hacks.sa1.overclock);
   bind(natural, "Hacks/SuperFX/Overclock", hacks.superfx.overclock);
 
+  bind(boolean, "Input/Pointer/Relative", input.pointer.relative);
+  
   #undef bind
 }
 
