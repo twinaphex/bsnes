@@ -24,13 +24,7 @@ else ifeq ($(platform),windows)
 else ifeq ($(platform),macos)
 	$(strip $(compiler) -o out/$(name).dylib -shared $(objects) $(options))
 else ifeq ($(platform), ios-arm64)
-# ifeq ($(IOSSDK),)
-# 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
-# endif
 	$(strip c++ -arch arm64 -marm -miphoneos-version-min=11.0 -isysroot $(shell xcodebuild -version -sdk iphoneos Path) -o out/$(name)_ios.dylib -shared $(objects) -lpthread -ldl)
 else ifeq ($(platform), tvos-arm64)
-# ifeq ($(IOSSDK),)
-#   IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
-# endif
 	$(strip c++ -arch arm64 -marm -mtvos-version-min=11.0 -isysroot $(shell xcodebuild -version -sdk appletvos Path) -o out/$(name)_tvos.dylib -shared $(objects) -lpthread -ldl)
 endif
