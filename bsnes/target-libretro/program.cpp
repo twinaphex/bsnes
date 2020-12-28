@@ -150,7 +150,6 @@ static int input_handle_touchscreen_lightgun( unsigned port, unsigned gun_device
 		case 1: // Y
 			return retro_pointer.y;
 		case 2: // Trigger
-			// todo: reverse button setting
 			return retro_pointer.superscope_trigger_pressed ? 1 : 0;
 		case 3: // Cursor
 			return retro_pointer.superscope_cursor_pressed ? 1 : 0;
