@@ -23,13 +23,8 @@ using namespace nall;
 
 static Emulator::Interface *emulator;
 
-// Touchscreen sensitivity vars
-static int pointer_pressed = 0;
-static const int POINTER_PRESSED_CYCLES = 4;
-static int pointer_cycles_after_released = 0;
-static int pointer_pressed_last_x = 0;
-static int pointer_pressed_last_y = 0;
-
+// Touchscreen Lightgun Support
+static const int POINTER_PRESSED_CYCLES = 4;  // For touchscreen sensitivity
 struct retro_pointer_state
 {
 	int x;
@@ -38,9 +33,14 @@ struct retro_pointer_state
 	bool superscope_cursor_pressed;
 	bool superscope_turbo_pressed;
 	bool superscope_start_pressed;
-};
 
+	int pointer_pressed = 0;
+	int pointer_cycles_after_released = 0;
+	int pointer_pressed_last_x = 0;
+	int pointer_pressed_last_y = 0;
+};
 static retro_pointer_state retro_pointer = { 0, 0, false, false, false, false };
+static bool retro_pointer_enabled = false;
 
 static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
 {
@@ -67,24 +67,24 @@ static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
 
 	// Touch sensitivity: Keep the gun position held for a fixed number of cycles after touch is released
 	// because a very light touch can result in a misfire
-	if ( pointer_cycles_after_released > 0 && pointer_cycles_after_released < POINTER_PRESSED_CYCLES ) {
-			pointer_cycles_after_released++;
-			retro_pointer.x = pointer_pressed_last_x;
-			retro_pointer.y = pointer_pressed_last_y;
+	if ( retro_pointer.pointer_cycles_after_released > 0 && retro_pointer.pointer_cycles_after_released < POINTER_PRESSED_CYCLES ) {
+			retro_pointer.pointer_cycles_after_released++;
+			retro_pointer.x = retro_pointer.pointer_pressed_last_x;
+			retro_pointer.y = retro_pointer.pointer_pressed_last_y;
 			return;
 	}
 
 	if ( input_state( port, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED ) )
 	{
-			pointer_pressed = 1;
-			pointer_cycles_after_released = 0;
-			pointer_pressed_last_x = x;
-			pointer_pressed_last_y = y;
-	} else if ( pointer_pressed ) {
-			pointer_cycles_after_released++;
-			pointer_pressed = 0;
-			x = pointer_pressed_last_x;
-			y = pointer_pressed_last_y;
+			retro_pointer.pointer_pressed = 1;
+			retro_pointer.pointer_cycles_after_released = 0;
+			retro_pointer.pointer_pressed_last_x = x;
+			retro_pointer.pointer_pressed_last_y = y;
+	} else if ( retro_pointer.pointer_pressed ) {
+			retro_pointer.pointer_cycles_after_released++;
+			retro_pointer.pointer_pressed = 0;
+			x = retro_pointer.pointer_pressed_last_x;
+			y = retro_pointer.pointer_pressed_last_y;
 			// unpress the primary trigger
 			retro_pointer.superscope_trigger_pressed = false;
 			return;
@@ -144,7 +144,6 @@ static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
 static int input_handle_touchscreen_lightgun( unsigned port, unsigned gun_device, unsigned inputId)
 {
 	input_update_pointer_lightgun(port, gun_device);
-	printf("yoshi debug: x: %i, y: %i, trig: %i, curs: %i, turbo: %i, start: %i\n", retro_pointer.x, retro_pointer.y, retro_pointer.superscope_trigger_pressed, retro_pointer.superscope_cursor_pressed, retro_pointer.superscope_turbo_pressed, retro_pointer.superscope_start_pressed);
 	switch (inputId)
 	{
 		case 0: // X
@@ -161,8 +160,7 @@ static int input_handle_touchscreen_lightgun( unsigned port, unsigned gun_device
 		case 5: // Pause
 			return retro_pointer.superscope_start_pressed ? 1 : 0;
 		default:
-			printf("Unknown input for super scope: %i \n",inputId);
-			return 0;
+			return 0; // Unknown input
 	} 
 }
 
@@ -459,9 +457,14 @@ auto pollInputDevices(uint port, uint device, uint input) -> int16
 		// TODO: SuperScope/Justifiers.
 		// Do we care? The v94 port hasn't hooked them up. :)
 		case SuperFamicom::ID::Device::SuperScope:
+		{
 			libretro_device = RETRO_DEVICE_LIGHTGUN_SUPER_SCOPE;
-			return input_handle_touchscreen_lightgun(libretro_port, libretro_device, input);
+			if (retro_pointer_enabled)
+			{
+				return input_handle_touchscreen_lightgun(libretro_port, libretro_device, input);
+			}
 			break;
+		}
 
 		default:
 			return 0;

@@ -285,6 +285,21 @@ static void flush_variables()
 		else
 			run_ahead_frames = atoi(variable.value);
 	}
+
+	variable = { "bsnes_touchscreen_lightgun", nullptr };
+	if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &variable) && variable.value)
+	{
+		if (strcmp(variable.value, "ON") == 0)
+		{
+			emulator->configure("Input/Pointer/Relative", false);
+			retro_pointer_enabled = true;
+		}
+		else
+		{
+			emulator->configure("Input/Pointer/Relative", true);
+			retro_pointer_enabled = false;
+		}
+	}
 	
 	// Refresh Geometry
 	struct retro_system_av_info avinfo;
@@ -471,6 +486,7 @@ static void set_environment_info(retro_environment_t cb)
 		{ "bsnes_coprocessor_prefer_hle", "Coprocessor Prefer HLE; ON|OFF" },
 		{ "bsnes_sgb_bios", "Preferred Super GameBoy BIOS (restart); SGB1.sfc|SGB2.sfc" },
 		{ "bsnes_run_ahead_frames", "Amount of frames for run-ahead; OFF|1|2|3|4" },
+		{ "bsnes_touchscreen_lightgun", "Enable Touchscreen Lightgun; ON|OFF" },		
 		{ nullptr },
 	};
 	cb(RETRO_ENVIRONMENT_SET_VARIABLES, const_cast<retro_variable *>(vars));
