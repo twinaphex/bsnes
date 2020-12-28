@@ -86,7 +86,10 @@ static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
 			x = retro_pointer.pointer_pressed_last_x;
 			y = retro_pointer.pointer_pressed_last_y;
 			// unpress the primary trigger
-			retro_pointer.superscope_trigger_pressed = false;
+			if (retro_pointer_superscope_reverse_buttons)
+				retro_pointer.superscope_cursor_pressed = false;
+			else
+				retro_pointer.superscope_trigger_pressed = false;
 			return;
     }
 		retro_pointer.x = x;
