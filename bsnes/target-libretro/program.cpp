@@ -41,7 +41,7 @@ struct retro_pointer_state
 };
 static retro_pointer_state retro_pointer = { 0, 0, false, false, false, false };
 static bool retro_pointer_enabled = false;
-
+static bool retro_pointer_superscope_reverse_buttons = false;
 static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
 {
 	int x, y;
@@ -109,25 +109,21 @@ static void input_update_pointer_lightgun( unsigned port, unsigned gun_device)
 							} else if ( touch_count == 3 ) {
 									turbo_pressed = true;
 							} else if ( touch_count == 2 ) {
-								// todo: handle reverse buttons setting
-								cursor_pressed = true;
-									// if ( setting_superscope_reverse_buttons )
-									// {
-									// 		trigger_pressed = true;
-									// } else
-									// {
-									// 		cursor_pressed = true;
-									// }
+								if ( retro_pointer_superscope_reverse_buttons )
+								{
+									trigger_pressed = true;
+								} else
+								{
+									cursor_pressed = true;
+								}
 							} else {
-								// todo: handle reverse buttons setting
-								trigger_pressed = true;
-									// if ( setting_superscope_reverse_buttons )
-									// {
-									// 		cursor_pressed = true;
-									// } else
-									// {
-									// 		trigger_pressed = true;
-									// }
+								if ( retro_pointer_superscope_reverse_buttons )
+								{
+									cursor_pressed = true;
+								} else
+								{
+									trigger_pressed = true;
+								}
 							}
 					}
 					retro_pointer.superscope_trigger_pressed = trigger_pressed;
