@@ -458,8 +458,9 @@ auto pollInputDevices(uint port, uint device, uint input) -> int16
 			if (retro_pointer_enabled)
 			{
 				return input_handle_touchscreen_lightgun(libretro_port, libretro_device, input);
+			} else {
+				return 0;
 			}
-			break;
 		}
 
 		default:
