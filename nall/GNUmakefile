@@ -68,6 +68,14 @@ ifeq ($(compiler),)
     compiler := clang++
   else ifeq ($(platform),linux)
     compiler := g++
+  else ifeq ($(platform),libnx)
+    include $(DEVKITPRO)/libnx/switch_rules
+    PORTLIBS := $(PORTLIBS_PATH)/switch
+    PATH := $(PORTLIBS)/bin:$(PATH)
+    LIBNX ?= $(DEVKITPRO)/libnx
+    compiler = $(CC) -std=gnu11
+    compiler.cpp = $(CXX) -std=gnu++17
+    openmp = false
   else ifeq ($(platform),bsd)
     compiler := g++8
   else
@@ -128,6 +136,11 @@ endif
 # linux settings
 ifeq ($(platform),linux)
   options += -ldl
+endif
+
+# libnx settings
+ifeq ($(platform),libnx)
+  flags += -D__SWITCH__=1 -DSWITCH -DHAVE_LIBNX
 endif
 
 # bsd settings
