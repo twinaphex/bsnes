@@ -14,6 +14,8 @@ INCFLAGS := \
 SOURCES_C   += $(CORE_DIR)/libco/libco.c \
 					$(GB_DIR)/Core/apu.c \
 					$(GB_DIR)/Core/camera.c \
+					$(GB_DIR)/Core/cheats.c \
+					$(GB_DIR)/Core/debugger.c \
 					$(GB_DIR)/Core/display.c \
 					$(GB_DIR)/Core/gb.c \
 					$(GB_DIR)/Core/joypad.c \
@@ -22,11 +24,14 @@ SOURCES_C   += $(CORE_DIR)/libco/libco.c \
 					$(GB_DIR)/Core/printer.c \
 					$(GB_DIR)/Core/random.c \
 					$(GB_DIR)/Core/rewind.c \
+					$(GB_DIR)/Core/rumble.c \
 					$(GB_DIR)/Core/save_state.c \
 					$(GB_DIR)/Core/sgb.c \
 					$(GB_DIR)/Core/sm83_cpu.c \
+					$(GB_DIR)/Core/sm83_disassembler.c \
 					$(GB_DIR)/Core/symbol_hash.c \
 					$(GB_DIR)/Core/timing.c \
+					$(GB_DIR)/Core/workboy.c \
 
 SOURCES_CXX += \
 					$(BSNES_DIR)/target-libretro/libretro.cpp \

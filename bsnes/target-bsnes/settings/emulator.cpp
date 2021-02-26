@@ -23,6 +23,11 @@ auto EmulatorSettings::create() -> void {
   nativeFileDialogs.setText("Use native file dialogs").setChecked(settings.general.nativeFileDialogs).onToggle([&] {
     settings.general.nativeFileDialogs = nativeFileDialogs.checked();
   });
+  screenSaver.setText("Allow screensaver during emulation").setChecked(settings.general.screenSaver).onToggle([&] {
+    settings.general.screenSaver = screenSaver.checked();
+    // setting can be toggled while emulation is active
+    if(!program.inactive()) Application::setScreenSaver(settings.general.screenSaver);
+  });
   optionsSpacer.setColor({192, 192, 192});
 
   fastForwardLabel.setText("Fast Forward").setFont(Font().setBold());

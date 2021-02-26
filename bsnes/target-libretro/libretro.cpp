@@ -287,7 +287,7 @@ static void flush_variables()
 		else
 			run_ahead_frames = atoi(variable.value);
 	}
-
+	
 	variable = { "bsnes_touchscreen_lightgun", nullptr };
 	if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &variable) && variable.value)
 	{
@@ -302,7 +302,7 @@ static void flush_variables()
 			retro_pointer_enabled = false;
 		}
 	}
-
+	
 	variable = { "bsnes_touchscreen_lightgun_superscope_reverse", nullptr };
 	if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &variable) && variable.value)
 	{

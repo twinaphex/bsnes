@@ -34,12 +34,13 @@ struct retro_pointer_state
 	bool superscope_cursor_pressed;
 	bool superscope_turbo_pressed;
 	bool superscope_start_pressed;
-
+	
 	int pointer_pressed = 0;
 	int pointer_cycles_after_released = 0;
 	int pointer_pressed_last_x = 0;
 	int pointer_pressed_last_y = 0;
 };
+
 static retro_pointer_state retro_pointer = { 0, 0, false, false, false, false };
 static bool retro_pointer_enabled = false;
 static bool retro_pointer_superscope_reverse_buttons = false;
@@ -217,7 +218,7 @@ public:
 	struct GameBoy : Game {
 		vector<uint8_t> program;
 	} gameBoy;
-	
+
 	struct BSMemory : Game {
 		vector<uint8_t> program;
 	} bsMemory;
@@ -306,15 +307,6 @@ auto Program::load() -> void {
 	// per-game hack overrides
 	auto title = superFamicom.title;
 	auto region = superFamicom.region;
-
-	//sometimes menu options are skipped over in the main menu with cycle-based joypad polling
-	if(title == "Arcades Greatest Hits") emulator->configure("Hacks/CPU/FastJoypadPolling", true);
-
-	//the start button doesn't work in this game with cycle-based joypad polling
-	if(title == "TAIKYOKU-IGO Goliath") emulator->configure("Hacks/CPU/FastJoypadPolling", true);
-
-	//holding up or down on the menu quickly cycles through options instead of stopping after each button press
-	if(title == "WORLD MASTERS GOLF") emulator->configure("Hacks/CPU/FastJoypadPolling", true);
 
 	//relies on mid-scanline rendering techniques
 	if(title == "AIR STRIKE PATROL" || title == "DESERT FIGHTER") emulator->configure("Hacks/PPU/Fast", false);
@@ -498,6 +490,7 @@ auto pollInputDevices(uint port, uint device, uint input) -> int16
 				return 0;
 			}
 		}
+		
 
 		default:
 			return 0;

@@ -21,7 +21,6 @@ auto Configuration::process(Markup::Node document, bool load) -> void {
   bind(text,    "Hacks/Entropy", hacks.entropy);
   bind(natural, "Hacks/CPU/Overclock", hacks.cpu.overclock);
   bind(boolean, "Hacks/CPU/FastMath", hacks.cpu.fastMath);
-  bind(boolean, "Hacks/CPU/FastJoypadPolling", hacks.cpu.fastJoypadPolling);
   bind(boolean, "Hacks/PPU/Fast", hacks.ppu.fast);
   bind(boolean, "Hacks/PPU/Deinterlace", hacks.ppu.deinterlace);
   bind(natural, "Hacks/PPU/RenderCycle", hacks.ppu.renderCycle);
@@ -38,9 +37,9 @@ auto Configuration::process(Markup::Node document, bool load) -> void {
   bind(boolean, "Hacks/Coprocessor/PreferHLE", hacks.coprocessor.preferHLE);
   bind(natural, "Hacks/SA1/Overclock", hacks.sa1.overclock);
   bind(natural, "Hacks/SuperFX/Overclock", hacks.superfx.overclock);
-
-  bind(boolean, "Input/Pointer/Relative", input.pointer.relative);
   
+  bind(boolean, "Input/Pointer/Relative", input.pointer.relative);
+
   #undef bind
 }
 

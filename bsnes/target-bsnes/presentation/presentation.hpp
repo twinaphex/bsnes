@@ -118,17 +118,17 @@ struct Presentation : Window {
       MenuItem stateManager{&toolsMenu};
       MenuItem manifestViewer{&toolsMenu};
     Menu helpMenu{&menuBar};
-      MenuItem documentation{&helpMenu};
-      MenuSeparator helpSeparator{&helpMenu};
       MenuItem aboutSameBoy{&helpMenu};
-      MenuItem about{&helpMenu};
+      MenuItem aboutBsnes{&helpMenu};
 
   VerticalLayout layout{this};
     HorizontalLayout viewportLayout{&layout, Size{~0, ~0}, 0};
       Viewport viewport{&viewportLayout, Size{~0, ~0}, 0};
       VerticalLayout iconLayout{&viewportLayout, Size{0, ~0}, 0};
         Canvas iconSpacer{&iconLayout, Size{144, ~0}, 0};
-        Canvas iconCanvas{&iconLayout, Size{128, 128}, 0};
+        HorizontalLayout iconHorizontal{&iconLayout, Size{144, 128}, 0};
+          Canvas iconCanvas{&iconHorizontal, Size{128, 128}, 0};
+          Canvas iconPadding{&iconHorizontal, Size{16, 128}, 0};
     HorizontalLayout statusLayout{&layout, Size{~0, StatusHeight}, 0};
       Label spacerIcon{&statusLayout, Size{8, ~0}, 0};
       Canvas statusIcon{&statusLayout, Size{16, ~0}, 0};

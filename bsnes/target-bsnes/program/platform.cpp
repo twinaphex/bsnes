@@ -88,12 +88,7 @@ auto Program::open(uint id, string name, vfs::file::mode mode, bool required) ->
   }
 
   if(!result && required) {
-    if(MessageDialog({
-      "Error: missing required data: ", name, "\n\n",
-      "Would you like to view the online documentation for more information?"
-    }).setAlignment(*presentation).error({"Yes", "No"}) == "Yes") {
-      presentation.documentation.doActivate();
-    }
+    MessageDialog({"Error: missing required data: ", name}).setAlignment(*presentation).error();
   }
 
   return result;
@@ -221,7 +216,14 @@ auto Program::videoFrame(const uint16* data, uint pitch, uint width, uint height
   if(!settings.video.overscan) {
     uint multiplier = height / 240;
     data += 8 * multiplier * pitch;
-    height -= 16 * multiplier;
+    if (gameBoy.program)
+		{
+			height -= 16.1 * multiplier;
+		}
+		else
+		{
+			height -= 16 * multiplier;
+		}
   }
 
   uint outputWidth, outputHeight;
