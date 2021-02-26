@@ -28,7 +28,6 @@ SOURCES_C   += $(CORE_DIR)/libco/libco.c \
 					$(GB_DIR)/Core/sm83_cpu.c \
 					$(GB_DIR)/Core/symbol_hash.c \
 					$(GB_DIR)/Core/timing.c \
-					$(GB_DIR)/Core/workboy.c \
 
 SOURCES_CXX += \
 					$(BSNES_DIR)/target-libretro/libretro.cpp \
