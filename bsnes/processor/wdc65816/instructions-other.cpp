@@ -205,9 +205,12 @@ E S.h = 0x01;
 auto WDC65816::instructionPullB() -> void {
   idle();
   idle();
-L B = pull();
+// looks like it reads from $200 and the official CPU manual got it wrong.
+// Reproduced and verified on real hardware via https://github.com/gilyon/snes-tests
+L B = pullN();
   ZF = B == 0;
   NF = B & 0x80;
+  E S.h = 0x01;
 }
 
 auto WDC65816::instructionPullP() -> void {
